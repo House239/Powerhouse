@@ -1,0 +1,244 @@
+Main Stuff
+
+    - Port the material system from Technologycraft into this mod, and change it so that it uses a registry instead of an arraylist
+    - Port the mechanical power system from Technologycraft into this mod, and make it actually work
+    - Add a heat energy system
+
+
+Material System
+
+    - This system is designed to make adding new types of materials and shapes easy
+    - There are 2 types of parts required for making items for materials:
+        - Material
+        - Shape
+    - There are multiple different types of materials, each of which have certain shapes for them, those being:
+        - Metals (Overrides existing items/blocks)
+        - Gems
+        - Dusts (like redstone or glowstone)
+    - Materials items do not override existing items from vanilla, unless specifically set to override them
+    - Textures for materials are made by recoloring the base texture of the material shape
+        - Color is set with the material itself
+        - Materials can also use overlay parts instead of a color, which can be used to make more special textures for certain materials
+    - There are many types of materials already in the mod, or from other mods:
+        - Metals:
+            - Iron
+            - Gold
+            - Copper
+            - Tin
+            - Silver
+            - Nickel
+            - Lead
+            - Platinum
+            - Zinc
+
+            - Bronze: Alloy made of 3 parts copper and 1 part tin
+            - Brass: Alloy made of 1 part copper and 1 part zinc
+            - Electrum: Alloy made of 2 parts gold and 1 part silver
+            - Steel: Special alloy, doesn't have any default recipes in this mod though
+            - Sterling Silver: Alloy made of 3 parts silver and 1 part copper
+
+            - All Metallurgy metals
+            - All Thaumcraft metals
+        - Gems:
+            - Diamond
+            - Emerald
+            - Ruby
+            - Sapphire
+            - Topaz
+            - Amethyst
+            - Peridot
+            - Olivine
+            - Tanzanite
+            - Onyx
+        - Dusts:
+            - Redstone
+            - Glowstone
+            - Dust
+            - Ash
+    - There are also many material shapes already in the mod too:
+        - Metals:
+            - Ingot (placeable)
+            - Nugget
+            - Lump
+            - Double Ingot (placeable)
+            - Plate
+            - Double Plate
+            - Dense Plate
+            - Axle (placeable, uses rod oredict)
+            - Gear (placeable, has 3 different sizes)
+            - Coil (placeable)
+            - Wire
+            - Nail
+            - Screw
+            - Bolt
+            - Nut
+            - Block (placeable)
+            - Plating (placeable)
+            - Sheetmetal (placeable)
+            - Bricks (placeable)
+            - Bars (placeable)
+            - Door (placeable)
+            - Trapdoor (placeable)
+            - Dust
+            - Small Dust
+            - Tiny Dust
+        - Gems:
+            - Gem
+            - Block (placeable)
+            - Dust
+            - Small Dust
+            - Tiny Dust
+        - Dusts:
+            - Dust
+            - Small Dust
+            - Tiny Dust
+
+
+Mechanical Power System
+
+    - Values for the system:
+        - Speed (Rounds per minute, RPM)
+        - Torque (Newtons, Nm)
+        - Power (Joules, J), always speed * torque
+        - Direction (Clockwise or counterclockwise)
+    - Some components have variants for each material, with the stats depending on the material
+    - Most components have a max power, and they will break if they exceed that power
+        - Machines and generators don't have a max power
+    - Some components accept lubricant to increase their max power, different lubricants increase max power by different amounts
+
+    - Technical info:
+        - Components must have input and output sides to be able to transfer mechanical power
+            - For static components such as gearboxes or machine inputs, inputs and outputs are on a set side depending on where it's facing
+            - For dynamic components such as axles or gears, inputs and outputs will automatically be set based on which blocks next to it have inputs or outputs connected to that side
+        - Mechanical components must set the mechanical power of the component in front of it to a certain value every time mechanical power changes
+            - This means you have to set speed to 0 every time mechanical power stops flowing forwards
+            - Do not set speed without setting torque, as that would mean that it would keep the torque that was previously stored in the component instead of the torque you want, which is not good
+        - When transferring mechanical power, make sure to set it so that it can only send power to input sides
+        - Make sure to "refresh" mechanical power when a mechanical component gets updated, meaning that it does these in this specific order:
+            - Checks to see if there's still a mechanical component on its input side with an output facing opposite of the side, if not, sets its speed and torque to 0
+            - Recalculates input and output sides
+            - Sets the mechanical power on the output sides to whatever is currently in the axle
+            - Resets merged axles
+
+
+Heat Energy System
+
+    - Values for the system:
+        - Temperature (Celsius, °C)
+        - Power (Joules, J), calculated based on the amount of temperature above or below ambient temperature
+    - Things that produce heat increase the heat in the network
+    - Heat will slowly go back to the ambient temperature, which is different in every biome
+    - Heat can also go below ambient temperature, which is used for a few machines and such
+    - Things that use heat are either endothermic, exothermic or isothermic
+    	- Endothermic takes away heat
+    	- Exothermic increases heat
+    	- Isothermic keeps heat the same
+
+
+Mechanical Power Stuff
+
+    - Axle: Transfers mechanical power in a line, cannot be lubricated
+    - Axle Junction: Like an axle, but can move power in different directions, plus split and merge power, cannot be lubricated, different types are:
+        - L: Moves power to one of its sides other than the one on the opposite side of the input
+        - T: Moves power to the side opposite of the input and another one of its sides
+        - Y: Moves power to two of its sides other than the one on the opposite side of the input
+    - Gearbox: Does gear ratios, meaning that it multiplies/divides speed by a certain amount and does the opposite to the torque, keeping power the same, can be lubricated
+    - Mechanical Belt: Connects between two or more axles, can be used to transport mechanical power to different areas, cannot be lubricated
+    - Clutch: Stops mechanical power from going through it when it receives a redstone signal, can be lubricated
+    - Gearshift: Changes the direction of mechanical power going through it when it receives a redstone signal, can be lubricated
+    - Speedometer: Can be placed on a mechanical component to measure its speed, torque, power and direction
+    - Flywheel: Stores mechanical power and releases it when given a redstone signal, outputs power at a configurable speed and breaks if stored power exceeds a certain amount, cannot be lubricated
+    - Mechanical Debugger: Tool that shows inputs and outputs of mechanical components
+    - DC Redstone Engine: Generates mechanical power when it has a redstone signal
+    - Water Wheel: Generates mechanical power from flowing water
+    - Windmill: Generates mechanical power from wind
+    - Stirling Engine: Generates mechanical power from heat
+    - Steam Engine: Generates mechanical power from steam
+    - Electric Motor: Generates mechanical power from RF
+    - Electric Dynamo: Generates RF from mechanical power
+    - Creative Engine: Generates infinite mechanical power at any speed, creative only
+
+
+Heat Stuff
+
+    - Basic Burner: Uses solid fuels to generate heat
+    - Basic Liquid Burner: Uses liquid fuels to generate heat
+    - Heat Cable: Moves heat around
+    - Small Steam Boiler: Uses heat to boil water into steam
+    - Friction Heater: Uses mechanical power to produce heat
+    - Induction Heater: Uses RF to produce heat
+    - Creative Heat Source: Generates infinite heat at any temperature, creative only
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

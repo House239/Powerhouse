@@ -1,0 +1,10 @@
+
+material.powerhouse:iron.name=Iron
+material.powerhouse:diamond.name=Diamond
+material.powerhouse:redstone.name=Redstone
+
+shape.powerhouse.ingot.name=Ingot
+shape.powerhouse.gem.name=
+shape.powerhouse.dust.name=Dust
+
+format.powerhouse.material_shape=%s %s
